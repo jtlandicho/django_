@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <!--=============== REMIXICONS ===============-->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+
+   <!--=============== CSS ===============-->
+   <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+
+   <title>Register Form - Parking Management System</title>
+
+   <script>
+      function validatePasswords(event) {
+         // Get password values
+         const password1 = document.getElementById("password1").value;
+         const password2 = document.getElementById("password2").value;
+
+         // Check if passwords match
+         if (password1 !== password2) {
+            // Show alert if passwords don't match
+            alert("Passwords do not match. Please re-enter.");
+            event.preventDefault(); // Prevent form submission
+         }
+      }
+
+   </script>
+   <script>
+      document.addEventListener("DOMContentLoaded", function () {
+         const modal = document.getElementById('privacyModal');
+         const agreeBtn = document.getElementById('agreeBtn');
+         const agreeCheckbox = document.getElementById('agreeCheckbox');
+   
+         // Show modal on page load
+         modal.style.display = 'flex';
+   
+         // Enable "Continue" button when checkbox is checked
+         agreeCheckbox.addEventListener('change', function () {
+            agreeBtn.disabled = !this.checked;
+         });
+   
+         // Close modal when "Continue" is clicked
+         agreeBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+         });
+
+         // Close modal when "Continue" is clicked
+      });
+      document.addEventListener("DOMContentLoaded", function () {
+         let btn = document.getElementById("disagreeBtn");
+         btn.addEventListener("click", function () {
+            let url = btn.getAttribute("data-url");  // Get URL from data attribute
+            window.location.href = url;
+      });
+   });
+   </script>
+   
+
+
+</head>
+<body>
+   
+   <div id="privacyModal" class="modal">
+
+      <div class="modal-background">
+         <div class="modal" id="myModal">
+            <div class="modal-content">
+               <h2><i class="fas fa-exclamation-circle"></i>Data Privacy Notice</h2>
+               <br>
+               <p>
+                  APC collects and maintains personal data as part of its records management process in accordance with Republic Act 10173, or the Data Privacy Act (DPA) of 2012. Likewise, APC adheres to the general principles of transparency, legitimate purpose, and proportionality in the processing of personal data and information (Rule IV. Sec. 18, IRR, DPA of 2012).
+               </p>
+               <p>
+                  For more details about the APC Data Privacy Policy you may visit <a href="https://www.apc.edu.ph" target="_blank">www.apc.edu.ph</a>.
+               </p>
+      
+               <label>
+                  <input type="checkbox" id="agreeCheckbox">
+                  <strong>I have read and understood the collection, processing, and management of my personal data along with the policies and guidelines stated in the Asia Pacific College Data Privacy Policy.</strong>
+               </label>
+               <p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Likewise, I express adherence to the rules and regulations of Asia Pacific College without hesitation and &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; reservation. I further understand that APC reserves the right to amend all, or in part, the provisions in &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;these guidelines.</strong></p>
+               <button id="disagreeBtn" data-url="{% url 'disagree' %}">I Disagree</button>
+               <button id="agreeBtn" disabled>I agree</button>
+            </div>
+         </div>
+      </div>
+  </div>
+   {% if messages %}
+   {% for message in messages %}
+       <div class="alert alert-danger">{{ message }}</div>
+   {% endfor %}
+  {% endif %}
+   <div class="ParkSense">Powered by ParkSense</div>
+   <div class="login">
+      <img src="{% static 'images/apcbuildingblue.png' %}" alt="image" class="login__bg">
+
+      <form action="" method="post" class="login__form" onsubmit="validatePasswords(event)">
+         {% csrf_token %}
+         <div class="log__header">
+            <img src="{% static 'images/apc_logo.png' %}" class="logo">
+            <h1 class="login__title">Parking Management System</h1>
+         </div>
+         <hr class="break">
+         <div class="login__inputs">
+            <div class="login__box">
+               <input type="text" placeholder="Username" required class="login__input" id="username" name="username">
+               <i class="ri-user-fill"></i>
+               <label for="Username" class="login__label"></label>
+            </div>
+
+            <div class="login__box">
+               <input type="email" placeholder="Email" required class="login__input" id="email" name="email">
+               <i class="ri-mail-fill"></i>
+               <label for="email" class="login__label"></label>
+            </div>
+
+            <div class="login__box">
+               <input type="password" placeholder="Password" required class="login__input" id="password1" name="password1">
+               <i class="ri-lock-2-fill"></i>
+               <label for="password1" class="login__label"></label>
+
+            </div>
+
+            <div class="login__box">
+               <input type="password" placeholder="Re-Type Password" required class="login__input" id="password2" name="password2">
+               <i class="ri-lock-2-fill"></i>
+               <label for="password2" class="login__label"></label>
+            </div>
+         </div>
+         <button type="submit" class="login__button">Register</button>
+         <div class="login__login">
+            <i class="ri-arrow-left-s-line"> </i>
+            <a href="{% url 'login' %}">Back to login</a>
+      </form>
+   </div>
+</body>
+</html>

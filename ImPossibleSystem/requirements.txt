@@ -1,0 +1,49 @@
+# Core dependencies
+asgiref==3.8.1
+Django==3.2.23
+djongo==1.3.6  # MongoDB connector for Django
+pymongo==3.12.3  # Required by djongo
+dnspython==2.4.2  # Required for MongoDB DNS resolution
+
+# REST API
+djangorestframework==3.14.0
+
+# Database and parsing
+sqlparse==0.2.4  # Required by djongo
+
+# Redis Caching
+django-redis==5.4.0
+redis==4.5.5
+
+# Server-Sent Events (SSE)
+channels==4.0.0
+daphne==4.0.0
+
+# Excel export functionality
+et_xmlfile==2.0.0  # Required by openpyxl
+openpyxl==3.1.5
+
+# Date and time handling
+pytz==2025.1
+
+# Development and Debugging
+ipython==8.22.1  # Interactive Python shell
+django-extensions==3.2.3  # Additional management commands
+
+# Optional: Arduino Communication
+pyserial==3.5  # For serial communication with Arduino
+
+# Optional: Performance and Monitoring
+psutil==5.9.8  # System and process utilities
+sentry-sdk==1.40.6  # Error tracking and monitoring
+
+# Security
+python-dotenv==1.0.1  # Environment variable management
+
+# Testing
+pytest==7.4.4
+pytest-django==4.7.0
+
+# Deployment (optional)
+gunicorn==21.2.0  # WSGI HTTP Server
+whitenoise==6.6.0  # Static file serving

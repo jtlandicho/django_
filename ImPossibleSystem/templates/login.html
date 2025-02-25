@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+
+    <!--=============== CSS ===============-->
+    {% load static %}  <!-- Load the static template tag -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">  <!-- Update CSS link -->
+
+    <title>Login form - Parking Management System</title>
+</head>
+<body>
+    <!-- Toast Container -->
+
+    <div class="login">
+        <img src="{% static '/images/apcbuildingblue.png' %}" alt="image" class="login__bg">  <!-- Update image link -->
+
+        <form action="" class="login__form" method ="POST">
+            {% csrf_token %}
+            <div class="log__header">
+                <img src="{% static 'images/apc_logo.png' %}" class="logo">  <!-- Update logo link -->
+                <h1 class="login__title">Parking Management System</h1>
+            </div>
+            <hr class="break">
+            <div class="login__inputs">
+                <div class="login__box">
+                    <input type="username" placeholder="Username" required class="login__input" id ="username" name ="username">
+                    <i class="ri-user-fill"></i>
+                    <label for="username"></label>
+                </div>
+
+                <div class="login__box">
+                    <input type="password" placeholder="Password" required class="login__input" id="password", name="pass">
+                    <i class="ri-lock-2-fill"></i>
+                    <label for="password"></label>
+
+                </div>
+
+            <button type="submit" class="login__button">Login</button>
+
+            <div class="login__register">
+                Don't have an account? <a href="{% url 'signup' %}">Register</a>
+            </div>
+        </form>
+    </div>
+    <div id="toast-container"></div>
+    <style>
+        /* Toast container styles */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 2.5s;
+            opacity: 0;
+        }
+
+        .toast.info {
+            background-color: #3498db;
+        }
+
+        .toast.error {
+            background-color: #e74c3c;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+
+    <script>
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toast-container').appendChild(toast);
+
+            // Force a reflow to trigger the animation
+            toast.offsetHeight;
+
+            // Add the animation class
+            toast.style.opacity = '1';
+
+            // Remove the toast after animation
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Show Django messages as toasts
+        {% if messages %}
+        {% for message in messages %}
+            showToast('{{ message|escapejs }}', 'error');
+        {% endfor %}
+        {% endif %}
+            window.onload = function() {
+            document.getElementById('privacyModal').style.display = 'flex';
+        };
+
+        // Enable "Continue" button when checkbox is checked
+        document.getElementById('agreeCheckbox').addEventListener('change', function() {
+            document.getElementById('agreeBtn').disabled = !this.checked;
+        });
+
+        // Close modal and enable login when "Continue" is clicked
+        document.getElementById('agreeBtn').addEventListener('click', function() {
+            document.getElementById('privacyModal').style.display = 'none';
+            document.getElementById('login-btn').disabled = false;
+        });
+    </script>
+</body>
+</html>
+
+<!----------------
+
+user account:
+
+user = User.objects.get(username='jtlandicho')  
+user.set_password('123')   
+user.save()
+
+admin/
+
+super user:
+Username: JohnJorelLandicho1234
+Password: JohnJorelLandicho1234
+------------------>

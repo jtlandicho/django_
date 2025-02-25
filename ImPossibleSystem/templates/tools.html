@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+    <title>Tools - ParkSense</title>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="logo-section">
+                <a href="{% url 'home' %}" class="logo">
+                    <img src="{% static 'images/apc_logo.png' %}" alt="APC Logo">
+                    <span class="brand-name">ParkSense</span>
+                </a>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="{% url 'analytics' %}">
+                        <i class="ri-pie-chart-box-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tools' %}" class="active">
+                        <i class="ri-tools-fill"></i>
+                        <span>Tools</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-section">
+                <div class="timeanddate">
+                    <span class="date" id="current-date"></span>
+                    <span>|</span>
+                    <span class="time" id="current-time"></span>
+                </div>
+                <div class="user-info">
+                    {% if user.is_authenticated %}
+                        <span>{{ user.username }}</span>
+                    {% else %}
+                        <span>Guest</span>
+                    {% endif %}
+                    <i class="ri-user-4-line"></i>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="ri-logout-box-line"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <div class="main-content">
+        <div class="tools-content">
+            <h1 class="page-title">Tools</h1>
+
+            <!-- Tools Sections -->
+            <div class="tools-sections">
+                <!-- Analytics Section -->
+                <section class="tools-section">
+                    <h2 class="section-title">
+                        <i class="ri-pie-chart-2-line"></i>
+                        Analytics Tools
+                    </h2>
+                    <div class="tools-grid">
+                        <!-- Export Analytics Tool -->
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon">
+                                    <i class="ri-file-excel-2-line"></i>
+                                </div>
+                                <h3>Export Analytics Report</h3>
+                            </div>
+                            <div class="tool-details">
+                                <p>Generate and download comprehensive parking analytics reports in Excel format.</p>
+                                
+                                <form action="{% url 'analytics' %}" method="get" class="report-form">
+                                    <input type="hidden" name="export" value="excel">
+                                    
+                                    <div class="form-group">
+                                        <label>Report Type:</label>
+                                        <select name="report_type" class="form-control" id="reportType">
+                                            <option value="daily">Daily Report</option>
+                                            <option value="monthly">Monthly Report</option>
+                                            <option value="yearly">Yearly Report</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Daily Report Fields -->
+                                    <div class="form-group" id="dailyFields">
+                                        <label>Select Date:</label>
+                                        <input type="date" name="date" class="form-control">
+                                    </div>
+
+                                    <!-- Monthly Report Fields -->
+                                    <div class="form-group" id="monthlyFields" style="display: none;">
+                                        <label>Select Month and Year:</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <select name="month" class="form-control">
+                                                    {% for month in months %}
+                                                    <option value="{{ month.number }}" {% if month.number == current_month %}selected{% endif %}>{{ month.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select name="year" class="form-control">
+                                                    {% for year in available_years %}
+                                                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Yearly Report Fields -->
+                                    <div class="form-group" id="yearlyFields" style="display: none;">
+                                        <label>Select Year:</label>
+                                        <select name="year" class="form-control">
+                                            {% for year in available_years %}
+                                            <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-download-2-line"></i>
+                                        Generate Report
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {% if user.is_superuser %}
+                <!-- System Section -->
+                <section class="tools-section">
+                    <h2 class="section-title">
+                        <i class="ri-settings-2-line"></i>
+                        System Tools
+                    </h2>
+                    <div class="tools-grid">
+                        <!-- Placeholder for future system tools -->
+                        <div class="tool-card tool-card-placeholder">
+                            <div class="tool-header">
+                                <div class="tool-icon">
+                                    <i class="ri-add-line"></i>
+                                </div>
+                                <h3>More Tools Coming Soon</h3>
+                            </div>
+                            <div class="tool-details">
+                                <p>Additional system management and configuration tools will be added here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Maintenance Section -->
+                <section class="tools-section">
+                    <h2 class="section-title">
+                        <i class="ri-tools-line"></i>
+                        Maintenance Tools
+                    </h2>
+                    <div class="tools-grid">
+                        <!-- Slot Management Tool -->
+                        <div class="tool-card">
+
+                            <div class="tool-header">
+                                <div class="tool-icon">
+                                    <i class="ri-parking-box-line"></i>
+                                </div>
+                                <h3>Parking Slot Management</h3>
+                            </div>
+                            <div class="tool-details">
+                                <p>Manage parking slots, reset status, and handle maintenance mode.</p>
+                                <form action="{% url 'tools' %}" method="post" class="slot-management-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tool" value="slot_management">
+                                    
+                                    <div class="form-group">
+                                        <label>Action:</label>
+                                        <select name="action" class="form-control" id="slotAction">
+                                            <option value="reset">Reset Slot Status</option>
+                                            <option value="maintenance">Toggle Maintenance Mode</option>
+                                            <option value="type">Change Slot Type</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Select Slots:</label>
+                                        <select name="slots" class="form-control" multiple>
+                                            {% for slot in parking_slots %}
+                                            <option value="{{ slot.id }}">{{ slot.get_vehicle_type_display }} Slot {{ slot.slot_number }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple slots</small>
+                                    </div>
+
+                                    <div class="form-group" id="typeSelection" style="display: none;">
+                                        <label>New Type:</label>
+                                        <select name="new_type" class="form-control">
+                                            <option value="car">Car</option>
+                                            <option value="motorcycle">Motorcycle</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-save-line"></i>
+                                        Apply Changes
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Data Management Tool -->
+                        <div class="tool-card">
+                            <div class="tool-header">
+                                <div class="tool-icon">
+                                    <i class="ri-database-2-line"></i>
+                                </div>
+                                <h3>Data Management</h3>
+                            </div>
+                            <div class="tool-details">
+                                <p>Manage parking history data and perform database maintenance.</p>
+                                <form action="{% url 'tools' %}" method="post" class="data-management-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tool" value="data_management">
+                                    
+                                    <div class="form-group">
+                                        <label>Action:</label>
+                                        <select name="action" class="form-control" id="dataAction">
+                                            <option value="cleanup">Clean Old Data</option>
+                                            <option value="backup">Export Database Backup</option>
+                                            <option value="reset_counters">Reset Analytics Counters</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" id="cleanupOptions">
+                                        <label>Keep Data For:</label>
+                                        <select name="retention" class="form-control">
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                            <option value="180">Last 6 Months</option>
+                                            <option value="365">Last Year</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-play-line"></i>
+                                        Execute Action
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+<style>
+/* Toast container styles */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 2.5s;
+    opacity: 0;
+}
+
+.toast.info {
+    background-color: #3498db;
+}
+
+.toast.success {
+    background-color: #2ecc71;
+}
+
+.toast.warning {
+    background-color: #f1c40f;
+}
+
+.toast.error {
+    background-color: #e74c3c;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Main content styles */
+.tools-content {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Section styles */
+.tools-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 1.5em;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    font-size: 1.2em;
+    color: #4F81BD;
+}
+
+/* Grid layout */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+/* Tool card styles */
+.tool-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+
+
+.tool-card.tool-card-placeholder {
+    border: 2px dashed #ddd;
+    background: #fafafa;
+}
+
+.tool-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.tool-icon {
+    font-size: 1.8em;
+    color: #4F81BD;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f7ff;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.tool-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.25em;
+}
+
+.tool-details {
+    color: #666;
+}
+
+.tool-details p {
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    border-color: #4F81BD;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 129, 189, 0.1);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding-right: 40px;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+    margin: 0 -7.5px;
+}
+
+.col-md-6 {
+    flex: 1;
+    padding: 0 7.5px;
+}
+
+/* Button styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    width: 100%;
+}
+
+.btn i {
+    font-size: 1.2em;
+}
+
+.btn-primary {
+    background-color: #4F81BD;
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+    background-color: #3a5f8d;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .row {
+        flex-direction: column;
+    }
+    
+    .col-md-6 {
+        width: 100%;
+    }
+}
+</style>
+
+
+</style>
+
+<script>
+    // Handle Slot Management Form
+    document.addEventListener('DOMContentLoaded', function() {
+        const slotAction = document.getElementById('slotAction');
+        const typeSelection = document.getElementById('typeSelection');
+        
+        if (slotAction && typeSelection) {
+            slotAction.addEventListener('change', function() {
+                typeSelection.style.display = this.value === 'type' ? 'block' : 'none';
+            });
+        }
+
+        // Handle Data Management Form
+        const dataAction = document.getElementById('dataAction');
+        const cleanupOptions = document.getElementById('cleanupOptions');
+        
+        if (dataAction && cleanupOptions) {
+            dataAction.addEventListener('change', function() {
+                cleanupOptions.style.display = this.value === 'cleanup' ? 'block' : 'none';
+            });
+        }
+    });
+
+// Handle report type selection
+document.getElementById('reportType').addEventListener('change', function() {
+    const reportType = this.value;
+    const dailyFields = document.getElementById('dailyFields');
+    const monthlyFields = document.getElementById('monthlyFields');
+    const yearlyFields = document.getElementById('yearlyFields');
+
+    // Hide all fields first
+    dailyFields.style.display = 'none';
+    monthlyFields.style.display = 'none';
+    yearlyFields.style.display = 'none';
+
+    // Show the relevant fields
+    switch(reportType) {
+        case 'daily':
+            dailyFields.style.display = 'block';
+            break;
+        case 'monthly':
+            monthlyFields.style.display = 'block';
+            break;
+        case 'yearly':
+            yearlyFields.style.display = 'block';
+            break;
+    }
+});
+
+// Handle form submission
+document.querySelector('.report-form').addEventListener('submit', function(e) {
+    const reportType = document.getElementById('reportType').value;
+    
+    if (reportType === 'monthly') {
+        e.preventDefault();
+        const monthSelect = document.querySelector('#monthlyFields select[name="month"]');
+        const yearSelect = document.querySelector('#monthlyFields select[name="year"]');
+        const month = monthSelect.value.padStart(2, '0');
+        const year = yearSelect.value;
+        
+        // Create the month string in YYYY-MM format
+        const monthStr = `${year}-${month}`;
+        
+        // Update the form action URL with the correct month parameter
+        const url = new URL(this.action);
+        url.searchParams.set('export', 'excel');
+        url.searchParams.set('report_type', 'monthly');
+        url.searchParams.set('month', monthStr);
+        
+        // Redirect to the new URL
+        window.location.href = url.toString();
+    }
+});
+
+function updateDateTime() {
+    const now = new Date();
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', dateOptions);
+    document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US');
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.getElementById('toast-container').appendChild(toast);
+
+    // Force a reflow to trigger the animation
+    toast.offsetHeight;
+
+    // Add the animation class
+    toast.style.opacity = '1';
+
+    // Remove the toast after animation
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}
+
+// Show Django messages as toasts
+{% if messages %}
+{% for message in messages %}
+    showToast('{{ message|escapejs }}', 'info');
+{% endfor %}
+{% endif %}
+
+// Update every second
+setInterval(updateDateTime, 1000);
+
+// Call once to initialize
+updateDateTime();
+
+// Show initial fields based on default selection
+document.getElementById('reportType').dispatchEvent(new Event('change'));
+</script>
+</html>
+

@@ -1,0 +1,8 @@
+2025-02-16 23:42:23,916 - arduino_parking_sensor - INFO - Serial Port Diagnostics:
+2025-02-16 23:42:23,926 - arduino_parking_sensor - ERROR - No serial ports found.
+2025-02-16 23:42:23,928 - arduino_parking_sensor - INFO - Checking pattern /dev/ttyACM*: []
+2025-02-16 23:42:23,928 - arduino_parking_sensor - INFO - Checking pattern /dev/ttyUSB*: []
+2025-02-16 23:42:23,928 - arduino_parking_sensor - INFO - Checking pattern /dev/tty.usbserial*: []
+2025-02-16 23:42:23,929 - arduino_parking_sensor - INFO - Checking pattern /dev/tty.usbmodem*: []
+2025-02-16 23:42:23,929 - arduino_parking_sensor - INFO - Found possible Arduino ports: []
+2025-02-16 23:42:23,930 - arduino_parking_sensor - ERROR - No Arduino port found.

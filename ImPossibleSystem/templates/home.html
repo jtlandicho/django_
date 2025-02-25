@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+    <title>Home Page</title>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-content">
+        <div class="logo-section">
+          <a href="{% url 'home' %}" class="logo">
+            <img src="{% static 'images/apc_logo.png' %}" alt="APC Logo">
+            <span class="brand-name">ParkSense</span>
+          </a>
+        </div>
+
+        <ul class="nav-links">
+
+          <li>
+            <a href="{% url 'analytics' %}">
+              <i class="ri-pie-chart-box-line"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'tools' %}">
+              <i class="ri-tools-fill"></i>
+              <span>Tools</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="user-section">
+          <div class="timeanddate">
+            <span class="date" id="current-date"></span>
+            <span>|</span>
+            <span class="time" id="current-time"></span>
+          </div>
+          <div class="user-info">
+            {% if user.is_authenticated %}
+              <span>{{ user.username }}</span>
+            {% else %}
+              <span>Guest</span>
+            {% endif %}
+            <i class="ri-user-4-line"></i>
+          </div>
+          <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="ri-logout-box-line"></i>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="hero-content">
+        <div class="slots-card">
+          <h2 class="slots-title">Total Available Slots</h2>
+          <div class="slots-overview">
+            <div class="slot-type">
+              <div class="slot-number">{{ car_stats.available }}</div>
+              <div class="slot-icon"><i class="ri-car-line"></i></div>
+              <div class="slot-label">CARS</div>
+            </div>
+            <div class="slot-divider"></div>
+            <div class="slot-type">
+              <div class="slot-number">{{ motorcycle_stats.available }}</div>
+              <div class="slot-icon"><i class="ri-bike-line"></i></div>
+              <div class="slot-label">MOTORCYCLES</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="parking-lot-section">
+          <h2><i class="ri-parking-box-line"></i> Parking Lot Layout</h2>
+          <div class="parking-lot">
+            {% for slot in car_stats.slots %}
+            <div class="slot {{ slot.status|lower }}" data-sensor-id="{{ slot.sensor_id }}" data-slot-type="car">
+              <div class="slot-status-dot"></div>
+              <div class="slot-icon"><i class="ri-car-line"></i></div>
+              <div class="slot-name">Car {{ slot.slot_number }}</div>
+              <div class="slot-status">{{ slot.status|title }}</div>
+              <div class="slot-time">{{ slot.last_updated|time:"h:i A" }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="divider"></div>
+          <div class="parking-lot">
+            {% for slot in motorcycle_stats.slots %}
+            <div class="slot {{ slot.status|lower }}" data-sensor-id="{{ slot.sensor_id }}" data-slot-type="motorcycle">
+              <div class="slot-status-dot"></div>
+              <div class="slot-icon"><i class="ri-bike-line"></i></div>
+              <div class="slot-name">Motorcycle {{ slot.slot_number }}</div>
+              <div class="slot-status">{{ slot.status|title }}</div>
+              <div class="slot-time">{{ slot.last_updated|time:"h:i A" }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color available"></div>
+              <span>Available</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color occupied"></div>
+              <span>Occupied</span>
+            </div>
+          </div>
+        </div>
+
+        {% if user.is_superuser %}
+        <div class="simulation-card">
+          <h2><i class="ri-tools-line"></i> Simulation Controls</h2>
+          <div class="simulation-controls">
+            <div class="control-section">
+              <h3>Car Slots</h3>
+              {% for slot in car_stats.slots %}
+              <div class="control-item">
+                <span>Car {{ slot.slot_number }}</span>
+                <button class="simulate-btn {% if slot.status == 'occupied' %}occupied{% endif %}" 
+                        data-sensor-id="{{ slot.sensor_id }}"
+                        data-slot-type="car"
+                        data-status="{{ slot.status }}">
+                  {% if slot.status == 'occupied' %}
+                    Remove Vehicle
+                  {% else %}
+                    Park Vehicle
+                  {% endif %}
+                </button>
+              </div>
+              {% endfor %}
+            </div>
+            
+            <div class="control-section">
+              <h3>Motorcycle Slots</h3>
+              {% for slot in motorcycle_stats.slots %}
+              <div class="control-item">
+                <span>Motorcycle {{ slot.slot_number }}</span>
+                <button class="simulate-btn {% if slot.status == 'occupied' %}occupied{% endif %}" 
+                        data-sensor-id="{{ slot.sensor_id }}"
+                        data-slot-type="motorcycle"
+                        data-status="{{ slot.status }}">
+                  {% if slot.status == 'occupied' %}
+                    Remove Vehicle
+                  {% else %}
+                    Park Vehicle
+                  {% endif %}
+                </button>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="banner-card">
+          <div class="background-image">
+            <img src="{% static 'images/apcbuilding_blue123.png' %}" alt="APC Building">
+          </div>
+          <div class="banner-content">
+            <div class="ram-logo">
+              <img src="{% static 'images/rams-clear.png' %}" alt="APC Ram">
+            </div>
+            <div class="banner-text">
+              <h1>Monitoring Parking</h1>
+              <p>at your fingertips.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Function to get CSRF token from cookies
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const csrftoken = getCookie('csrftoken');
+        
+        // Add event listeners to simulate buttons
+        const simulateButtons = document.querySelectorAll('.simulate-btn');
+        simulateButtons.forEach(button => {
+          button.addEventListener('click', async function() {
+            const sensorId = this.dataset.sensorId;
+            const slotType = this.dataset.slotType;
+            const currentStatus = this.dataset.status;
+            
+            // If current status is 'occupied', simulate vehicle leaving (150cm)
+            // Otherwise, simulate vehicle parking (20cm)
+            const distance = currentStatus === 'occupied' ? 150 : 20;
+            const isOccupied = currentStatus !== 'occupied';
+            
+            try {
+              const response = await fetch('/api/sensor-reading/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrftoken
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                  sensor_id: sensorId,
+                  distance: distance,
+                  is_occupied: isOccupied
+                })
+              });
+              
+              if (response.ok) {
+                // Update button text and class immediately
+                this.textContent = isOccupied ? 'Remove Vehicle' : 'Park Vehicle';
+                this.classList.toggle('occupied', isOccupied);
+                this.dataset.status = isOccupied ? 'occupied' : 'available';
+                
+                // Reload after a short delay to show the change
+                setTimeout(() => location.reload(), 300);
+              } else {
+                const errorData = await response.json();
+                console.error('Failed to send sensor reading:', errorData.error);
+                alert('Failed to update sensor reading. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              alert('Failed to connect to the server. Please try again.');
+            }
+          });
+        });
+        
+        // Server-Sent Events for real-time updates
+        const eventSource = new EventSource('/sse/parking-updates/');
+        
+        // Detailed event logging
+        eventSource.addEventListener('open', function(event) {
+            console.log('SSE connection opened successfully');
+        });
+        
+        eventSource.addEventListener('error', function(event) {
+            console.error('EventSource failed with full error object:', event);
+            
+            // More detailed error investigation
+            if (event.target.readyState === EventSource.CLOSED) {
+                console.error('EventSource connection closed');
+            } else if (event.target.readyState === EventSource.CONNECTING) {
+                console.error('EventSource attempting to reconnect');
+            }
+            
+            // Attempt to get more context
+            fetch('/sse/parking-updates/')
+                .then(response => {
+                    console.log('Direct fetch response:', response.status, response.statusText);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Response text:', text);
+                })
+                .catch(fetchError => {
+                    console.error('Direct fetch error:', fetchError);
+                });
+            
+            eventSource.close(); // Close the connection on error
+        });
+        
+        eventSource.onmessage = function(event) {
+          try {
+            console.log('Raw SSE event data:', event.data);
+            const parkingUpdates = JSON.parse(event.data);
+            console.log('Parsed SSE data:', parkingUpdates);
+            
+            // Update car slots
+            console.log('Updating car slots:', parkingUpdates.car_slots);
+            parkingUpdates.car_slots.forEach(slot => {
+              console.log('Processing car slot:', slot);
+              
+              // Update simulation button
+              const simulationButton = document.querySelector(`.simulate-btn[data-sensor-id="${slot.sensor_id}"]`);
+              if (simulationButton) {
+                simulationButton.textContent = slot.status === 'occupied' ? 'Remove Vehicle' : 'Park Vehicle';
+                simulationButton.classList.toggle('occupied', slot.status === 'occupied');
+                simulationButton.dataset.status = slot.status;
+              }
+              
+              // Update parking layout slot
+              const parkingSlotElement = document.querySelector(`.parking-lot .slot[data-sensor-id="${slot.sensor_id}"]`);
+              if (parkingSlotElement) {
+                // Update slot status class
+                parkingSlotElement.classList.remove('available', 'occupied');
+                parkingSlotElement.classList.add(slot.status);
+                
+                // Update status text
+                const statusElement = parkingSlotElement.querySelector('.slot-status');
+                if (statusElement) {
+                  statusElement.textContent = slot.status.charAt(0).toUpperCase() + slot.status.slice(1);
+                }
+                
+                // Update last updated time
+                const timeElement = parkingSlotElement.querySelector('.slot-time');
+                if (timeElement && slot.last_updated) {
+                  const lastUpdatedDate = new Date(slot.last_updated);
+                  timeElement.textContent = lastUpdatedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
+                }
+              } else {
+                console.warn(`No parking layout element found for car sensor: ${slot.sensor_id}`);
+              }
+            });
+            
+            // Update motorcycle slots
+            console.log('Updating motorcycle slots:', parkingUpdates.motorcycle_slots);
+            parkingUpdates.motorcycle_slots.forEach(slot => {
+              console.log('Processing motorcycle slot:', slot);
+              
+              // Update simulation button
+              const simulationButton = document.querySelector(`.simulate-btn[data-sensor-id="${slot.sensor_id}"]`);
+              if (simulationButton) {
+                simulationButton.textContent = slot.status === 'occupied' ? 'Remove Vehicle' : 'Park Vehicle';
+                simulationButton.classList.toggle('occupied', slot.status === 'occupied');
+                simulationButton.dataset.status = slot.status;
+              }
+              
+              // Update parking layout slot
+              const parkingSlotElement = document.querySelector(`.parking-lot .slot[data-sensor-id="${slot.sensor_id}"]`);
+              if (parkingSlotElement) {
+                // Update slot status class
+                parkingSlotElement.classList.remove('available', 'occupied');
+                parkingSlotElement.classList.add(slot.status);
+                
+                // Update status text
+                const statusElement = parkingSlotElement.querySelector('.slot-status');
+                if (statusElement) {
+                  statusElement.textContent = slot.status.charAt(0).toUpperCase() + slot.status.slice(1);
+                }
+                
+                // Update last updated time
+                const timeElement = parkingSlotElement.querySelector('.slot-time');
+                if (timeElement && slot.last_updated) {
+                  const lastUpdatedDate = new Date(slot.last_updated);
+                  timeElement.textContent = lastUpdatedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
+                }
+              } else {
+                console.warn(`No parking layout element found for motorcycle sensor: ${slot.sensor_id}`);
+              }
+            });
+            
+            // Update total available slots display
+            const carSlotElements = document.querySelectorAll('.parking-lot .slot[data-slot-type="car"]');
+            const motorcycleSlotElements = document.querySelectorAll('.parking-lot .slot[data-slot-type="motorcycle"]');
+            
+            const carAvailableSlots = Array.from(carSlotElements)
+              .filter(el => el.classList.contains('available')).length;
+            const motorcycleAvailableSlots = Array.from(motorcycleSlotElements)
+              .filter(el => el.classList.contains('available')).length;
+            
+            // Safely update slot number displays
+            const carSlotNumberElement = document.querySelector('.slot-type:nth-child(1) .slot-number');
+            const motorcycleSlotNumberElement = document.querySelector('.slot-type:nth-child(2) .slot-number');
+            
+            if (carSlotNumberElement) {
+              carSlotNumberElement.textContent = carAvailableSlots;
+            }
+            
+            if (motorcycleSlotNumberElement) {
+              motorcycleSlotNumberElement.textContent = motorcycleAvailableSlots;
+            }
+            
+            console.log('SSE Update:', {
+              carAvailableSlots,
+              motorcycleAvailableSlots
+            });
+          } catch (error) {
+            console.error('Error parsing SSE data:', error);
+          }
+        };
+      });
+      
+    </script>
+
+    <script>
+      function updateDateTime() {
+      const now = new Date();
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', dateOptions);
+      document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US');
+      }
+      // Update every second
+      setInterval(updateDateTime, 1000);
+      
+      // Call once to initialize
+      updateDateTime();
+    </script>
+  </body>
+</html>

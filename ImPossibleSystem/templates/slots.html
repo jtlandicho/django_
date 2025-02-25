@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Parking Spaces</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #2d2d2d;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #4CAF50;
+        }
+
+        .space-info {
+            margin: 40px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #3d3d3d;
+        }
+
+        .label {
+            font-size: 1.5em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Seven Segment Display */
+        .seven-segment {
+            display: inline-block;
+            position: relative;
+            height: 8rem;
+            margin: 0 1rem;
+        }
+
+        .digit {
+            position: relative;
+            width: 5rem;
+            height: 8rem;
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .segment {
+            position: absolute;
+            width: 0.5rem;
+            height: 3rem;
+            background-color: #1e1e1e;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        /* Horizontal segments */
+        .segment-a, .segment-g, .segment-d {
+            width: 3rem;
+            height: 0.5rem;
+            left: 1rem;
+        }
+
+        .segment-a { top: 0; }
+        .segment-g { top: 3.75rem; }
+        .segment-d { bottom: 0; }
+
+        /* Vertical segments */
+        .segment-b, .segment-c { right: 0; }
+        .segment-e, .segment-f { left: 0; }
+
+        .segment-b, .segment-f { top: 0.5rem; }
+        .segment-c, .segment-e { bottom: 0.5rem; }
+
+        /* Active segment */
+        .segment.active {
+            box-shadow: 0 0 10px #00ff00;
+            background-color: #00ff00;
+        }
+
+        /* Red color when slots are full */
+        .segment.full {
+            box-shadow: 0 0 10px #ff0000;
+            background-color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Parking Spaces Available</h1>
+        
+        <div class="space-info">
+            <div class="label">Cars Available</div>
+            <div class="seven-segment" id="car-display"></div>
+        </div>
+
+        <div class="space-info">
+            <div class="label">Motorcycles Available</div>
+            <div class="seven-segment" id="motorcycle-display"></div>
+        </div>
+    </div>
+
+    <script>
+        // Seven segment patterns for digits 0-9
+        const DIGIT_PATTERNS = {
+            0: 'abcdef',
+            1: 'bc',
+            2: 'abged',
+            3: 'abgcd',
+            4: 'fgbc',
+            5: 'afgcd',
+            6: 'afgedc',
+            7: 'abc',
+            8: 'abcdefg',
+            9: 'abfgcd'
+        };
+
+        // Function to clear all segments
+        function clearDigit(digit) {
+            const segments = digit.querySelectorAll('.segment');
+            segments.forEach(segment => segment.classList.remove('active', 'full'));
+        }
+
+        // Function to create a digit display
+        function createDigit() {
+            const digit = document.createElement('div');
+            digit.className = 'digit';
+            
+            // Create segments a-g
+            'abcdefg'.split('').forEach(segment => {
+                const segmentEl = document.createElement('div');
+                segmentEl.className = `segment segment-${segment}`;
+                digit.appendChild(segmentEl);
+            });
+            
+            return digit;
+        }
+
+        // Function to update a single digit
+        function updateDigit(digit, number, isFull) {
+            // First clear all segments
+            clearDigit(digit);
+            const colorClass = isFull ? 'full' : 'active';
+
+            // Then activate the required segments
+            const pattern = DIGIT_PATTERNS[number];
+            if (pattern) {
+                const segments = digit.querySelectorAll('.segment');
+                segments.forEach(segment => {
+                    const segmentLetter = segment.className.split('-')[1];
+                    if (pattern.includes(segmentLetter)) {
+                        segment.classList.add(colorClass);
+                    }
+                });
+            }
+        }
+
+        // Initialize displays
+        function initializeDisplays() {
+            const carDisplay = document.getElementById('car-display');
+            const motorcycleDisplay = document.getElementById('motorcycle-display');
+            
+            // Create two digits for each display
+            [carDisplay, motorcycleDisplay].forEach(display => {
+                display.innerHTML = '';
+                display.appendChild(createDigit());
+                display.appendChild(createDigit());
+            });
+        }
+
+        // Function to update the display with new values
+        function updateDisplay(carCount, motorcycleCount) {
+            function updateValue(display, value) {
+                const digits = display.querySelectorAll('.digit');
+                const padded = value.toString().padStart(2, '0');
+                const isFull = padded === "00"; // Check if both digits are 0
+
+                // Update each digit
+                for (let i = 0; i < digits.length; i++) {
+                    const digit = digits[i];
+                    const newValue = parseInt(padded[i]);
+                    if (!isNaN(newValue)) {
+                        updateDigit(digit, newValue, isFull);
+                    }
+                }
+            }
+
+            updateValue(document.getElementById('car-display'), carCount);
+            updateValue(document.getElementById('motorcycle-display'), motorcycleCount);
+        }
+
+        // Initialize the displays when the page loads
+        initializeDisplays();
+
+        // Set up SSE connection with retry mechanism
+        function setupEventSource() {
+            if (window.eventSource) {
+                window.eventSource.close();
+            }
+
+            const eventSource = new EventSource('/sse/public-slots/');
+            window.eventSource = eventSource;
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    updateDisplay(
+                        data.available_car_slots,
+                        data.available_motorcycle_slots
+                    );
+                } catch (error) {
+                    console.error('Error processing update:', error);
+                }
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('SSE connection error:', error);
+                if (eventSource.readyState === EventSource.CLOSED) {
+                    eventSource.close();
+                    // Attempt to reconnect after 2 seconds
+                    setTimeout(setupEventSource, 2000);
+                }
+            };
+
+            return eventSource;
+        }
+
+        // Initial setup
+        setupEventSource();
+    </script>
+</body>
+</html>
